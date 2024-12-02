@@ -16,7 +16,76 @@
 ## 설치 방법
 
 1. **저장소 클론**
+
    ```bash
    git clone https://github.com/mingstagram/todolist.git
    cd todolist
    ```
+
+2. **백엔드 실행**
+
+- 필요한 의존성 설치
+  ```bash
+  go mod tidy
+  ```
+- 서버 실행
+  ```bash
+  go run cmd/server/main.go
+  ```
+
+3. **프론트엔드 실행**
+
+- 프론트엔드 디렉토리로 이동 후 의존성 설치
+  ```bash
+  cd frontend
+   npm install
+   npm start
+  ```
+
+---
+
+## 사용 방법
+
+1. 웹 브라우저에서 http://localhost:3000으로 접속
+2. 할 일을 추가하거나 삭제하며 테스트
+
+---
+
+## 기술 스택
+
+- 프론트엔드: React
+- 백엔드: Go (Gorilla/Mux)
+- 데이터베이스: MySQL
+- 배포: Docker, Kubernetes
+
+---
+
+## 기여 방법
+
+1. 이 저장소를 포크합니다.
+2. 새로운 브랜치를 생성합니다
+   ```bash
+   git checkout -b feature/my-feature
+   ```
+3. 변경 사항을 커밋합니다.
+   ```bash
+   git commit -m "Add my feature"
+   ```
+4. 브랜치를 푸시합니다.
+   ```bash
+   git push origin feature/my-feature
+   ```
+5. 풀 리퀘스트를 생성합니다.
+
+---
+
+## 라이선스
+
+이 프로젝트는 MIT 라이선스 하에 배포됩니다.
+
+```bash
+ ### **주의 사항**
+ 1. **간결하게 작성**: 너무 자세하게 쓰기보다 핵심적인 내용을 명확하게 전달하세요.
+ 2. **독자를 고려**: 프로젝트를 처음 접하는 사람이 쉽게 이해할 수 있도록 작성하세요.
+ 3. **꾸준히 업데이트**: 프로젝트가 발전함에 따라 `README.md`도 업데이트하세요.
+```

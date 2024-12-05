@@ -70,6 +70,12 @@ func (r *TasksRepository) SaveTasks(tasks models.Tasks) error {
 	return nil
 }
 
+// 할일 체크 유무 카운팅
+// func (r *TasksRepository) countTasks() (int, error) {
+// 	var count int
+
+// }
+
 // 할일 삭제
 
 // 할일 수정
@@ -77,5 +83,3 @@ func (r *TasksRepository) SaveTasks(tasks models.Tasks) error {
 // 할일 체크 / 체크해제
 
 // 날짜 이동
-
-// 할일 체크 유무 카운팅

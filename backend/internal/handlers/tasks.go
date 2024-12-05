@@ -32,7 +32,9 @@ func (h *TasksHandler) GetTodayTasks(w http.ResponseWriter, r *http.Request) {
 func (h *TasksHandler) GetTasksForDate(w http.ResponseWriter, r *http.Request) {
 	// 예를 들어, url 파라미터로 날짜를 받는다고 가정
 	dateParam := r.URL.Query().Get("date")
-	date, err := time.Parse("2006-01-02", dateParam)
+	
+	// 날짜 포맷 검증 및 변환 (YYYY-MM-DD)
+	date, err := time.Parse("2006-01-02", dateParam) 
 	if err != nil {
 		http.Error(w, "Invalid date format", http.StatusBadRequest)
 		return

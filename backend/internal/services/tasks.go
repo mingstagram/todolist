@@ -16,7 +16,7 @@ func NewTasksService(repo *repositories.TasksRepository) *TasksService {
 }
 
 // 오늘의 할일 조회
-func (s *TasksService) GetTodayTasks() ([]models.Tasks, error) {
+func (s *TasksService) GetTodayTasks() ([]models.Tasks, error) { 
 	today := time.Now().Format("2006-01-02")
 	return s.TasksRepo.GetTasksByDate(today)
 }
@@ -24,6 +24,8 @@ func (s *TasksService) GetTodayTasks() ([]models.Tasks, error) {
 // 특정 날짜의 할일 조회
 func (s *TasksService) GetTasksForDate(date time.Time) ([]models.Tasks, error) {
 	dateString := date.Format("2006-01-02")
+	fmt.Println(date)
+	fmt.Println(dateString)
 	return s.TasksRepo.GetTasksByDate(dateString)
 }
 

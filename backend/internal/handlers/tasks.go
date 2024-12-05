@@ -32,7 +32,7 @@ func (h *TasksHandler) GetTodayTasks(w http.ResponseWriter, r *http.Request) {
 func (h *TasksHandler) GetTasksForDate(w http.ResponseWriter, r *http.Request) {
 	// 예를 들어, url 파라미터로 날짜를 받는다고 가정
 	dateParam := r.URL.Query().Get("date")
-	
+
 	// 날짜 포맷 검증 및 변환 (YYYY-MM-DD)
 	date, err := time.Parse("2006-01-02", dateParam) 
 	if err != nil {
@@ -72,4 +72,38 @@ func (h *TasksHandler) SaveTasks(w http.ResponseWriter, r *http.Request) {
     }
 
     w.WriteHeader(http.StatusCreated)
+}
+
+// 할일 체크 유무 카운팅
+func (h *TasksHandler) CountTasks(w http.ResponseWriter, r *http.Request) { 
+	dateParam := r.URL.Query().Get("date")
+	// isCheckedParam := r.URL.Query().Get("isChecked")
+
+	// 날짜 포맷 검증 및 변환 (YYYY-MM-DD)
+	date, err := time.Parse("2006-01-02", dateParam) 
+	if err != nil {
+		http.Error(w, "Invalid date format", http.StatusBadRequest)
+		return
+	}
+
+	 // isChecked 값 검증 및 변환
+	//  var isChecked bool
+	//  if isCheckedParam == "true" {
+	// 	 isChecked = true
+	//  } else if isCheckedParam == "false" {
+	// 	 isChecked = false
+	//  } else {
+	// 	 http.Error(w, "Invalid isChecked value. Must be 'true' or 'false'.", http.StatusBadRequest)
+	// 	 return
+	//  }
+
+	count, err := h.Service.CountTasks(date)
+	if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+	// 응답 작성
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(map[string]int{"count": count})
 }

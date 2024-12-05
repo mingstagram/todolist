@@ -23,9 +23,7 @@ func (s *TasksService) GetTodayTasks() ([]models.Tasks, error) {
 
 // 특정 날짜의 할일 조회
 func (s *TasksService) GetTasksForDate(date time.Time) ([]models.Tasks, error) {
-	dateString := date.Format("2006-01-02")
-	fmt.Println(date)
-	fmt.Println(dateString)
+	dateString := date.Format("2006-01-02") 
 	return s.TasksRepo.GetTasksByDate(dateString)
 }
 
@@ -41,4 +39,9 @@ func(s *TasksService) SaveTasks(tasks models.Tasks) error {
 	}
 
 	return nil
+}
+
+// 할일 체크 유무 카운팅
+func (s *TasksService) CountTasks(date time.Time) (int, error) {
+	return s.TasksRepo.CountTasks(date)
 }

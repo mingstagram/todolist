@@ -19,6 +19,7 @@ func InitRouter(db *sql.DB) *mux.Router {
 
 	router.HandleFunc("/tasks/today", tasksHandler.GetTodayTasks).Methods("GET")
 	router.HandleFunc("/tasks/date", tasksHandler.GetTasksForDate).Methods("GET")
+	router.HandleFunc("/tasks/count", tasksHandler.CountTasks).Methods("GET")
 	router.HandleFunc("/tasks", tasksHandler.SaveTasks).Methods("POST")
  
 	return router

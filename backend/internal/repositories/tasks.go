@@ -4,6 +4,7 @@ import (
 	"backend/internal/models"
 	"database/sql"
 	"fmt"
+	"time"
 )
 
 type TasksRepository struct {
@@ -71,10 +72,21 @@ func (r *TasksRepository) SaveTasks(tasks models.Tasks) error {
 }
 
 // 할일 체크 유무 카운팅
-// func (r *TasksRepository) countTasks() (int, error) {
-// 	var count int
+func (r *TasksRepository) CountTasks(date time.Time) (int, error) {
+	rows, err := r.DB.Query("SELECT COUNT(*) FROM tasks WHERE !is_checked AND DATE(created_at) = ?", date)
+	if err != nil {
+		return 0, err
+	}
+	defer rows.Close()
 
-// }
+	var count int
+	for rows.Next() {
+        if err := rows.Scan(&count); err!= nil {
+            return 0, err
+        }  
+    }
+	return count, nil
+}
 
 // 할일 삭제
 

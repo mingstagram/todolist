@@ -45,3 +45,8 @@ func(s *TasksService) SaveTasks(tasks models.Tasks) error {
 func (s *TasksService) CountTasks(date time.Time) (int, error) {
 	return s.TasksRepo.CountTasks(date)
 }
+
+// 할일 체크 / 체크해제
+func (s *TasksService) UpdateChecked(checked bool, id int) error {
+	return s.TasksRepo.UpdateChecked(checked, id)
+}

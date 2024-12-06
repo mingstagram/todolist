@@ -17,9 +17,10 @@ func InitRouter(db *sql.DB) *mux.Router {
 	tasksService := services.NewTasksService(tasksRepository)
 	tasksHandler := handlers.NewTasksHandler(tasksService)
 
-	router.HandleFunc("/tasks/today", tasksHandler.GetTodayTasks).Methods("GET")
-	router.HandleFunc("/tasks/date", tasksHandler.GetTasksForDate).Methods("GET")
+	// router.HandleFunc("/tasks", tasksHandler.GetTodayTasks).Methods("GET")
+	router.HandleFunc("/tasks", tasksHandler.GetTasksForDate).Methods("GET")
 	router.HandleFunc("/tasks/count", tasksHandler.CountTasks).Methods("GET")
+	router.HandleFunc("/tasks/checked", tasksHandler.UpdateChecked).Methods("PUT")
 	router.HandleFunc("/tasks", tasksHandler.SaveTasks).Methods("POST")
  
 	return router

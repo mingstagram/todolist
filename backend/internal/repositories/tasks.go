@@ -88,10 +88,31 @@ func (r *TasksRepository) CountTasks(date time.Time) (int, error) {
 	return count, nil
 }
 
+// 할일 체크 / 체크해제
+func (r *TasksRepository) UpdateChecked(checked bool, id int) error {
+	tx, err := r.DB.Begin()
+	if err != nil {
+		return fmt.Errorf("failed to start transaction: %v", err)
+	} 
+
+	_, execErr := tx.Exec("UPDATE tasks SET is_checked = ? WHERE id = ?", checked, id)
+	if execErr != nil {
+		tx.Rollback()
+		err = fmt.Errorf("failed to execute query for id %d: %v", id, execErr)
+		return err
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("failed to commit transaction: %v", err)
+	}
+
+	return nil
+}
+
 // 할일 삭제
 
 // 할일 수정
-
-// 할일 체크 / 체크해제
 
 // 날짜 이동

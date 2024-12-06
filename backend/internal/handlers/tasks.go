@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -152,4 +153,33 @@ func (h *TasksHandler) UpdateChecked(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Task updated successfully"))
 
+}
+
+// 할일 삭제
+func (h *TasksHandler) DeleteTasks(w http.ResponseWriter, r *http.Request) {
+    // 요청 메서드 확인
+	if r.Method != http.MethodDelete {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+
+	idParam := r.URL.Query().Get("id")
+	if idParam == "" {
+		http.Error(w, "Missing id parameter", http.StatusBadRequest)
+		return
+	}
+
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		http.Error(w, "Invalid id parameter", http.StatusBadRequest)
+		return
+	}
+
+	err = h.Service.DeleteTasks(id)
+	if err != nil {
+		http.Error(w, "Failed to delete tasks", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }

@@ -17,7 +17,7 @@ func NewTasksRepository(db *sql.DB) *TasksRepository {
 
 // 일별 할일 조회
 func (r *TasksRepository) GetTasksByDate(date string) ([]models.Tasks, error) { 
-	rows, err := r.DB.Query("SELECT * FROM tasks WHERE DATE(created_at) = ?", date)
+	rows, err := r.DB.Query("SELECT * FROM tasks WHERE DATE(created_at) = ? AND !is_deleted", date)
 	if err != nil {
 		return nil, err
 	}
@@ -73,7 +73,7 @@ func (r *TasksRepository) SaveTasks(tasks models.Tasks) error {
 
 // 할일 체크 유무 카운팅
 func (r *TasksRepository) CountTasks(date time.Time) (int, error) {
-	rows, err := r.DB.Query("SELECT COUNT(*) FROM tasks WHERE !is_checked AND DATE(created_at) = ?", date)
+	rows, err := r.DB.Query("SELECT COUNT(*) FROM tasks WHERE !is_checked AND !is_deleted AND DATE(created_at) = ?", date)
 	if err != nil {
 		return 0, err
 	}
@@ -112,7 +112,26 @@ func (r *TasksRepository) UpdateChecked(checked bool, id int) error {
 }
 
 // 할일 삭제
+func (r *TasksRepository) DeleteTasks(id int) error {
+	tx, err := r.DB.Begin()
+    if err!= nil {
+        return fmt.Errorf("failed to start transaction: %v", err)
+    }
 
-// 할일 수정
+    _, execErr := tx.Exec("UPDATE tasks SET is_deleted = true WHERE id =?", id)
+    if execErr!= nil {
+        tx.Rollback()
+        err = fmt.Errorf("failed to execute query for id %d: %v", id, execErr)
+        return err
+    }
 
-// 날짜 이동
+    err = tx.Commit()
+    if err!= nil {
+        tx.Rollback()
+        return fmt.Errorf("failed to commit transaction: %v", err)
+    }
+
+    return nil
+}
+
+// 할일 수정 

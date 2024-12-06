@@ -50,3 +50,8 @@ func (s *TasksService) CountTasks(date time.Time) (int, error) {
 func (s *TasksService) UpdateChecked(checked bool, id int) error {
 	return s.TasksRepo.UpdateChecked(checked, id)
 }
+
+// 할일 삭제 
+func (s *TasksService) DeleteTasks(id int) error {
+	return s.TasksRepo.DeleteTasks(id)
+}

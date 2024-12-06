@@ -22,6 +22,7 @@ func InitRouter(db *sql.DB) *mux.Router {
 	router.HandleFunc("/tasks/count", tasksHandler.CountTasks).Methods("GET")
 	router.HandleFunc("/tasks/checked", tasksHandler.UpdateChecked).Methods("PUT")
 	router.HandleFunc("/tasks", tasksHandler.SaveTasks).Methods("POST")
+	router.HandleFunc("/tasks", tasksHandler.DeleteTasks).Methods("DELETE")
  
 	return router
 }

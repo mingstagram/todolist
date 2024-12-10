@@ -3,6 +3,7 @@ package handlers
 import (
 	"backend/internal/models"
 	"backend/internal/services"
+	"backend/internal/utils"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -72,7 +73,7 @@ func (h *TasksHandler) GetTasksForDate(w http.ResponseWriter, r *http.Request) {
 func (h *TasksHandler) SaveTasks(w http.ResponseWriter, r *http.Request) {
     // 요청 메서드 확인
 	if r.Method != http.MethodPost {
-		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		utils.ErrorResponse(w, "1002", "Invalid request method", http.StatusMethodNotAllowed)
 		return
 	}
 
@@ -80,29 +81,29 @@ func (h *TasksHandler) SaveTasks(w http.ResponseWriter, r *http.Request) {
 
     err := json.NewDecoder(r.Body).Decode(&tasks)
     if err!= nil {
-        http.Error(w, "Invalid input", http.StatusBadRequest)
+        utils.ErrorResponse(w, "1003", "Invalid input", http.StatusBadRequest)
         return
     }
 
 	if tasks.Task == "" {
-		http.Error(w, "Task cannot be empty", http.StatusBadRequest)
+		utils.ErrorResponse(w, "1004", "Task cannot be empty", http.StatusBadRequest)
 		return
 	}
 
     err = h.Service.SaveTasks(tasks)
     if err!= nil {
-        http.Error(w, err.Error(), http.StatusInternalServerError)
+        utils.ErrorResponse(w, "5000", err.Error(), http.StatusInternalServerError)
         return
     }
 
-    w.WriteHeader(http.StatusCreated)
+    utils.CreatedResponse(w, []models.Tasks{})
 }
 
 // 할일 체크 유무 카운팅
 func (h *TasksHandler) CountTasks(w http.ResponseWriter, r *http.Request) { 
     // 요청 메서드 확인
 	if r.Method != http.MethodGet {
-		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		utils.ErrorResponse(w, "1002",  "Invalid request method", http.StatusMethodNotAllowed)
 		return
 	}
 
@@ -112,26 +113,24 @@ func (h *TasksHandler) CountTasks(w http.ResponseWriter, r *http.Request) {
 	// 날짜 포맷 검증 및 변환 (YYYY-MM-DD)
 	date, err := time.Parse("2006-01-02", dateParam) 
 	if err != nil {
-		http.Error(w, "Invalid date format", http.StatusBadRequest)
+		utils.ErrorResponse(w, "1005",  "Invalid date format", http.StatusBadRequest)
 		return
 	} 
 
 	count, err := h.Service.CountTasks(date)
 	if err != nil {
-        http.Error(w, err.Error(), http.StatusInternalServerError)
+        utils.ErrorResponse(w, "5000",  err.Error(), http.StatusInternalServerError)
         return
     }
-
-	// 응답 작성
-    w.Header().Set("Content-Type", "application/json")
-    json.NewEncoder(w).Encode(map[string]int{"count": count})
+ 
+	utils.SuccessResponse(w, map[string]int{"count": count}) 
 }
 
 // 할일 체크 / 체크해제
 func (h *TasksHandler) UpdateChecked(w http.ResponseWriter, r *http.Request) {
     // 요청 메서드 확인
 	if r.Method != http.MethodPut {
-		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		utils.ErrorResponse(w, "1002", "Invalid request method", http.StatusMethodNotAllowed)
 		return
 	}
 
@@ -139,47 +138,45 @@ func (h *TasksHandler) UpdateChecked(w http.ResponseWriter, r *http.Request) {
 	var req UpdateCheckedRequest
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		utils.ErrorResponse(w, "1006", "Invalid request body", http.StatusBadRequest)
 		return
 	}
 
 	// 요청 데이터 사용
 	err = h.Service.UpdateChecked(req.Checked, req.ID)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Failed to update task: %v", err), http.StatusInternalServerError)
+		utils.ErrorResponse(w, "1007", fmt.Sprintf("Failed to update task: %v", err), http.StatusInternalServerError)
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Task updated successfully"))
-
+	utils.SuccessResponse(w, "Task updated successfully")  
 }
 
 // 할일 삭제
 func (h *TasksHandler) DeleteTasks(w http.ResponseWriter, r *http.Request) {
     // 요청 메서드 확인
 	if r.Method != http.MethodDelete {
-		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		utils.ErrorResponse(w, "1002", "Invalid request method", http.StatusMethodNotAllowed)
 		return
 	}
 
 	idParam := r.URL.Query().Get("id")
 	if idParam == "" {
-		http.Error(w, "Missing id parameter", http.StatusBadRequest)
+		utils.ErrorResponse(w, "1008", "Missing id parameter", http.StatusBadRequest)
 		return
 	}
 
 	id, err := strconv.Atoi(idParam)
 	if err != nil {
-		http.Error(w, "Invalid id parameter", http.StatusBadRequest)
+		utils.ErrorResponse(w, "1008", "Invalid id parameter", http.StatusBadRequest)
 		return
 	}
 
 	err = h.Service.DeleteTasks(id)
 	if err != nil {
-		http.Error(w, "Failed to delete tasks", http.StatusInternalServerError)
+		utils.ErrorResponse(w, "5000", "Failed to delete tasks", http.StatusInternalServerError)
 		return
 	}
 
-	w.WriteHeader(http.StatusNoContent)
+	utils.NoContentResponse(w)
 }

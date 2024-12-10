@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import TodoItem from "./TodoItem";
-import { deleteTasks, updateCheckedStatus } from "../api/TodoListApi"; // PUT 요청 API 호출 함수
+import { deleteTasks, updateCheckedStatus } from "../../api/TodosApi"; // PUT 요청 API 호출 함수
 
 const TodoListBlock = styled.div`
   flex: 1;

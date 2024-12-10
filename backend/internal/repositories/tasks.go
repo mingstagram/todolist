@@ -17,6 +17,7 @@ func NewTasksRepository(db *sql.DB) *TasksRepository {
 
 // 일별 할일 조회
 func (r *TasksRepository) GetTasksByDate(date string) ([]models.Tasks, error) { 
+	fmt.Println(date)
 	rows, err := r.DB.Query("SELECT * FROM tasks WHERE DATE(created_at) = ? AND !is_deleted", date)
 	if err != nil {
 		return nil, err
@@ -25,13 +26,20 @@ func (r *TasksRepository) GetTasksByDate(date string) ([]models.Tasks, error) {
 
 	var tasks []models.Tasks
 	for rows.Next() {
-		var task models.Tasks 
-		if err := rows.Scan(&task.ID, &task.Task, &task.IsChecked, &task.IsDeleted, &task.CreatedAt); err != nil {
+		var task models.Tasks  
+		var userId sql.NullInt64  // NULL 처리용 변수
+		if err := rows.Scan(&task.ID, &task.Task, &task.IsChecked, &task.IsDeleted, &task.CreatedAt, &userId); err != nil {
 			return nil, err
 		}
 
+		if userId.Valid {
+			task.UserId = int(userId.Int64)
+		} else {
+			task.UserId = 0  // NULL인 경우 기본값 설정
+		}
+
 		tasks = append(tasks, task)
-	}
+	} 
 
 	return tasks, nil
 }
@@ -90,48 +98,21 @@ func (r *TasksRepository) CountTasks(date time.Time) (int, error) {
 
 // 할일 체크 / 체크해제
 func (r *TasksRepository) UpdateChecked(checked bool, id int) error {
-	tx, err := r.DB.Begin()
+	_, err := r.DB.Exec("UPDATE tasks SET is_checked = ? WHERE id = ?", checked, id)
 	if err != nil {
-		return fmt.Errorf("failed to start transaction: %v", err)
-	} 
-
-	_, execErr := tx.Exec("UPDATE tasks SET is_checked = ? WHERE id = ?", checked, id)
-	if execErr != nil {
-		tx.Rollback()
-		err = fmt.Errorf("failed to execute query for id %d: %v", id, execErr)
-		return err
+		return fmt.Errorf("failed to execute query for id %d: %v", id, err)
 	}
-
-	err = tx.Commit()
-	if err != nil {
-		tx.Rollback()
-		return fmt.Errorf("failed to commit transaction: %v", err)
-	}
-
 	return nil
 }
 
 // 할일 삭제
 func (r *TasksRepository) DeleteTasks(id int) error {
-	tx, err := r.DB.Begin()
-    if err!= nil {
-        return fmt.Errorf("failed to start transaction: %v", err)
-    }
-
-    _, execErr := tx.Exec("UPDATE tasks SET is_deleted = true WHERE id =?", id)
-    if execErr!= nil {
-        tx.Rollback()
-        err = fmt.Errorf("failed to execute query for id %d: %v", id, execErr)
-        return err
-    }
-
-    err = tx.Commit()
-    if err!= nil {
-        tx.Rollback()
-        return fmt.Errorf("failed to commit transaction: %v", err)
-    }
-
-    return nil
+	_, err := r.DB.Exec("UPDATE tasks SET is_deleted = true WHERE id =?", id)
+	if err != nil {
+		return fmt.Errorf("failed to execute query for id %d: %v", id, err)
+	}
+	return nil
 }
+
 
 // 할일 수정 

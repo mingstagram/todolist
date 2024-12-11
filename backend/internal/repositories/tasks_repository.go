@@ -17,7 +17,6 @@ func NewTasksRepository(db *sql.DB) *TasksRepository {
 
 // 일별 할일 조회
 func (r *TasksRepository) GetTasksByDate(date string) ([]models.Tasks, error) { 
-	fmt.Println(date)
 	rows, err := r.DB.Query("SELECT * FROM tasks WHERE DATE(created_at) = ? AND !is_deleted", date)
 	if err != nil {
 		return nil, err

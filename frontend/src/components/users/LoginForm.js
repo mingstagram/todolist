@@ -42,6 +42,7 @@ const SnsTitle = styled.p`
 `;
 
 const LoginForm = ({ setIsLoggedIn }) => {
+  const sessionStorage = window.sessionStorage;
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -59,7 +60,10 @@ const LoginForm = ({ setIsLoggedIn }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const user = await loginUsers(formData);
+      const responseData = await loginUsers(formData);
+      const { token, userId } = responseData;
+      sessionStorage.setItem("accessToken", token);
+      sessionStorage.setItem("userId", userId);
       // 성공 시 리디렉션 처리 등
       setIsLoggedIn(true);
       navigate("/todos");

@@ -34,7 +34,6 @@ function TodoApp() {
     const formattedDate = date.toISOString().split("T")[0]; // ISO 포맷에서 날짜만 추출
     try {
       const data = await countTasksByDate(formattedDate); // 서버 호출
-      console.log(data);
       setCount(data.data.count);
     } catch (err) {
       setError("Failed to load tasks.");

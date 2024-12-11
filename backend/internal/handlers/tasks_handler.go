@@ -101,12 +101,14 @@ func (h *TasksHandler) SaveTasks(w http.ResponseWriter, r *http.Request) {
 
 // 할일 체크 유무 카운팅
 func (h *TasksHandler) CountTasks(w http.ResponseWriter, r *http.Request) { 
+	fmt.Println("1111")
     // 요청 메서드 확인
 	if r.Method != http.MethodGet {
 		utils.ErrorResponse(w, "1002",  "Invalid request method", http.StatusMethodNotAllowed)
 		return
 	}
 
+	fmt.Println("2222")
 	dateParam := r.URL.Query().Get("date")
 	// isCheckedParam := r.URL.Query().Get("isChecked")
 
@@ -116,12 +118,14 @@ func (h *TasksHandler) CountTasks(w http.ResponseWriter, r *http.Request) {
 		utils.ErrorResponse(w, "1005",  "Invalid date format", http.StatusBadRequest)
 		return
 	} 
+	fmt.Println("3333")
 
 	count, err := h.Service.CountTasks(date)
 	if err != nil {
         utils.ErrorResponse(w, "5000",  err.Error(), http.StatusInternalServerError)
         return
     }
+	fmt.Println("4444")
  
 	utils.SuccessResponse(w, map[string]int{"count": count}) 
 }

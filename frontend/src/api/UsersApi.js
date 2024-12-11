@@ -2,7 +2,7 @@ import axios from "axios";
 
 export const saveUsers = async (userData) => {
   try {
-    const response = await axios.post("/users", userData);
+    const response = await axios.post("/auth/signup", userData);
     return response;
   } catch (error) {
     console.error("Error creating users:", error);
@@ -12,8 +12,7 @@ export const saveUsers = async (userData) => {
 
 export const loginUsers = async (userData) => {
   try {
-    const response = await axios.post("/users/login", userData);
-
+    const response = await axios.post("/auth/login", userData);
     if (response.data.code === "0000") {
       return response.data.data; // 성공 시 데이터 반환
     } else {

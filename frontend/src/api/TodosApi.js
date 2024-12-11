@@ -1,8 +1,9 @@
 import axios from "axios";
+import axiosInstance from "../config/axiosConfig";
 
 export const getTasksByDate = async (date) => {
   try {
-    const response = await axios.get("/tasks?date=" + date);
+    const response = await axiosInstance.get(`/tasks?date=${date}`);
     return response.data;
   } catch (error) {
     console.error("Error load todaytasks:", error);
@@ -12,7 +13,7 @@ export const getTasksByDate = async (date) => {
 
 export const saveTasks = async (taskData) => {
   try {
-    const response = await axios.post("/tasks", taskData);
+    const response = await axiosInstance.post("/tasks", taskData);
     return response.data;
   } catch (error) {
     console.error("Error creating tasks:", error);
@@ -22,7 +23,7 @@ export const saveTasks = async (taskData) => {
 
 export const countTasksByDate = async (date) => {
   try {
-    const response = await axios.get(`/tasks/count?date=${date}`);
+    const response = await axiosInstance.get(`/tasks/count?date=${date}`);
     return response.data;
   } catch (error) {
     console.error("Error load todaytasks:", error);
@@ -32,7 +33,7 @@ export const countTasksByDate = async (date) => {
 
 export const updateCheckedStatus = async (id, isChecked) => {
   try {
-    const response = await axios.put("/tasks/checked", {
+    const response = await axiosInstance.put("/tasks/checked", {
       id,
       checked: isChecked,
     });
@@ -45,7 +46,7 @@ export const updateCheckedStatus = async (id, isChecked) => {
 
 export const deleteTasks = async (id) => {
   try {
-    const response = await axios.delete("/tasks?id=" + id);
+    const response = await axiosInstance.delete("/tasks?id=" + id);
     return response.data;
   } catch (error) {
     console.error("Error load todaytasks:", error);

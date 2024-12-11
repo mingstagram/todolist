@@ -4,6 +4,7 @@ import (
 	"backend/internal/common"
 	"backend/internal/models"
 	"backend/internal/repositories"
+	"backend/internal/utils"
 )
 
 type UsersService struct {
@@ -28,5 +29,13 @@ func (s *UsersService) SaveUsers(user models.Users) error {
 	if user.Email == "" || user.Password == "" || user.Name == "" {
 		return common.ErrMissingRequiredFields 
 	}
+	
+	hashedPassword, err := utils.HashPassword(user.Password)
+	if err != nil {
+		return err
+	}
+
+	user.Password = hashedPassword
+	
 	return s.UsersRepo.SaveUsers(user)
 }

@@ -56,8 +56,7 @@ const SignupForm = ({ onSignup }) => {
 
     try {
       const response = await saveUsers(formData);
-      console.log(response);
-      if (response.status === 201) {
+      if (response.data.code === "0000") {
         alert("회원가입 완료!");
         navigate("/login");
       } else {

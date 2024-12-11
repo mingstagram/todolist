@@ -9,4 +9,5 @@ var (
     ErrEmptyTask    = errors.New("task cannot be empty")
     ErrMissingRequiredFields   = errors.New("all fields are required")
     ErrFailedToSaveTask       = errors.New("failed to save task")
+    ErrUserNotFound = errors.New("user not found")
 )

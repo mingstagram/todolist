@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import styled from "styled-components";
 
 const TodoHeadBlock = styled.div`
@@ -7,6 +7,7 @@ const TodoHeadBlock = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: relative; /* 자식 요소 배치를 위해 추가 */
   h1 {
     margin: 0px;
     font-size: 36px;
@@ -22,6 +23,24 @@ const TodoHeadBlock = styled.div`
     font-size: 18px;
     margin-top: 40px;
     font-weight: bold;
+  }
+`;
+
+const LogoutButton = styled.button`
+  position: absolute; /* TodoHeadBlock의 오른쪽 상단에 위치 */
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: 1px solid #ff6b6b;
+  color: #ff6b6b;
+  font-size: 14px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+
+  &:hover {
+    background: #ff6b6b;
+    color: white;
   }
 `;
 
@@ -70,19 +89,18 @@ const nowDayOfTheWeek = (currentDate) => {
   return daysOfWeek[currentDate.getDay()];
 };
 
-function TodoHead({ date, setDate, count }) {
+function TodoHead({ date, setDate, count, handleLogout }) {
   const handlePreviousDay = () => {
-    // 새로운 Date 객체를 만들어야 상태가 올바르게 동작
     setDate(new Date(date.getTime() - 24 * 60 * 60 * 1000));
   };
 
   const handleNextDay = () => {
-    // 새로운 Date 객체를 만들어야 상태가 올바르게 동작
     setDate(new Date(date.getTime() + 24 * 60 * 60 * 1000));
   };
 
   return (
     <TodoHeadBlock>
+      <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
       <Navigation>
         <button onClick={handlePreviousDay}>&lt;</button>
         <h1>{nowDate(date)}</h1>

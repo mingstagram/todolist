@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	_ "backend/internal/kafka"
 	"backend/internal/models"
 	"backend/internal/services"
 	"backend/internal/utils"
@@ -24,24 +25,6 @@ func NewTasksHandler(service *services.TasksService) *TasksHandler {
 	return &TasksHandler{Service: service}
 }
 
-// 오늘의 할일 조회 핸들러
-func (h *TasksHandler) GetTodayTasks(w http.ResponseWriter, r *http.Request) {
-    // 요청 메서드 확인
-	if r.Method != http.MethodGet {
-		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
-		return
-	}
-
-	tasks, err := h.Service.GetTodayTasks()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(tasks)
-}
-
 // 특정 날짜의 할일 조회 핸들러
 func (h *TasksHandler) GetTasksForDate(w http.ResponseWriter, r *http.Request) {
     // 요청 메서드 확인
@@ -51,6 +34,7 @@ func (h *TasksHandler) GetTasksForDate(w http.ResponseWriter, r *http.Request) {
 	}
 	// 예를 들어, url 파라미터로 날짜를 받는다고 가정
 	dateParam := r.URL.Query().Get("date")
+	userId := r.URL.Query().Get("userId")
 
 	// 날짜 포맷 검증 및 변환 (YYYY-MM-DD)
 	date, err := time.Parse("2006-01-02", dateParam) 
@@ -59,7 +43,7 @@ func (h *TasksHandler) GetTasksForDate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tasks, err := h.Service.GetTasksForDate(date)
+	tasks, err := h.Service.GetTasksForDate(date, userId)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -77,19 +61,17 @@ func (h *TasksHandler) SaveTasks(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var tasks models.Tasks
+	var tasks models.Tasks 
 
-    err := json.NewDecoder(r.Body).Decode(&tasks)
+    err := json.NewDecoder(r.Body).Decode(&tasks) 
     if err!= nil {
         utils.ErrorResponse(w, "1003", "Invalid input", http.StatusBadRequest)
         return
     }
-
 	if tasks.Task == "" {
 		utils.ErrorResponse(w, "1004", "Task cannot be empty", http.StatusBadRequest)
 		return
 	}
-
     err = h.Service.SaveTasks(tasks)
     if err!= nil {
         utils.ErrorResponse(w, "5000", err.Error(), http.StatusInternalServerError)
@@ -100,16 +82,15 @@ func (h *TasksHandler) SaveTasks(w http.ResponseWriter, r *http.Request) {
 }
 
 // 할일 체크 유무 카운팅
-func (h *TasksHandler) CountTasks(w http.ResponseWriter, r *http.Request) { 
-	fmt.Println("1111")
+func (h *TasksHandler) CountTasks(w http.ResponseWriter, r *http.Request) {  
     // 요청 메서드 확인
 	if r.Method != http.MethodGet {
 		utils.ErrorResponse(w, "1002",  "Invalid request method", http.StatusMethodNotAllowed)
 		return
 	}
-
-	fmt.Println("2222")
+ 
 	dateParam := r.URL.Query().Get("date")
+	userId := r.URL.Query().Get("userId")
 	// isCheckedParam := r.URL.Query().Get("isChecked")
 
 	// 날짜 포맷 검증 및 변환 (YYYY-MM-DD)
@@ -117,15 +98,13 @@ func (h *TasksHandler) CountTasks(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		utils.ErrorResponse(w, "1005",  "Invalid date format", http.StatusBadRequest)
 		return
-	} 
-	fmt.Println("3333")
+	}  
 
-	count, err := h.Service.CountTasks(date)
+	count, err := h.Service.CountTasks(date, userId)
 	if err != nil {
         utils.ErrorResponse(w, "5000",  err.Error(), http.StatusInternalServerError)
         return
-    }
-	fmt.Println("4444")
+    } 
  
 	utils.SuccessResponse(w, map[string]int{"count": count}) 
 }
@@ -153,12 +132,19 @@ func (h *TasksHandler) UpdateChecked(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// // Kafka로 상태 변경 메시지 전송
+	// message := fmt.Sprintf("Task ID: %d updated to checked %v", req.ID, req.Checked)
+	// err = kafka.SendMessage(message)
+	// if err != nil {
+	// 	utils.ErrorResponse(w, "5000", "Failed to send kafka message", http.StatusInternalServerError)
+	// 	return
+	// } 
+
 	utils.SuccessResponse(w, "Task updated successfully")  
 }
 
 // 할일 삭제
-func (h *TasksHandler) DeleteTasks(w http.ResponseWriter, r *http.Request) {
-    // 요청 메서드 확인
+func (h *TasksHandler) DeleteTasks(w http.ResponseWriter, r *http.Request) { 
 	if r.Method != http.MethodDelete {
 		utils.ErrorResponse(w, "1002", "Invalid request method", http.StatusMethodNotAllowed)
 		return
@@ -176,11 +162,20 @@ func (h *TasksHandler) DeleteTasks(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// 할일 삭제
 	err = h.Service.DeleteTasks(id)
 	if err != nil {
 		utils.ErrorResponse(w, "5000", "Failed to delete tasks", http.StatusInternalServerError)
 		return
 	}
+
+	// // Kafka로 삭제된 할일 메시지 전송
+	// message := fmt.Sprintf("Task ID: %d deleted", id)
+	// err = kafka.SendMessage(message)
+	// if err != nil {
+	// 	utils.ErrorResponse(w, "5000", "Failed to send kafka message", http.StatusInternalServerError)
+    //     return
+	// }
 
 	utils.NoContentResponse(w)
 }

@@ -8,6 +8,7 @@ import {
 import LoginForm from "./components/users/LoginForm";
 import SignupForm from "./components/users/SignupForm";
 import TodoApp from "./components/todos/TodoApp";
+import KakaoRedirection from "./api/KakaoRedirection";
 
 const App = () => {
   // 로그인 상태 초기화: localStorage에서 로그인 정보 확인
@@ -30,6 +31,7 @@ const App = () => {
   return (
     <Router>
       <Routes>
+        <Route path="/kakao/callback" element={<KakaoRedirection />} />
         <Route
           path="/login"
           element={<LoginForm setIsLoggedIn={setIsLoggedIn} />}
@@ -37,7 +39,13 @@ const App = () => {
         <Route path="/signup" element={<SignupForm />} />
         <Route
           path="/todos"
-          element={isLoggedIn ? <TodoApp /> : <Navigate to="/login" />}
+          element={
+            isLoggedIn ? (
+              <TodoApp setIsLoggedIn={setIsLoggedIn} />
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
         />
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>

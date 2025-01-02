@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled, { css } from "styled-components";
 import { MdAdd } from "react-icons/md";
 import { saveTasks } from "../../api/TodosApi";
@@ -77,23 +77,39 @@ const Input = styled.input`
 `;
 
 function TodoCreate({ fetchTasksByDate, date, fetchCountTasksByDate }) {
+  const sessionStorage = window.sessionStorage;
+  const userId = sessionStorage.getItem("userId");
   const [open, setOpen] = useState(false);
-  const [task, setTask] = useState(""); // 입력값 관리
+  const [tasks, setTasks] = useState({
+    task: "",
+    user_id: parseInt(userId, 10),
+  });
   const [error, setError] = useState(null);
 
   const onToggle = () => setOpen(!open);
 
   const handleInputChange = (e) => {
-    setTask(e.target.value);
+    setTasks({
+      ...tasks,
+      task: e.target.value,
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!task.trim()) return; // 공백 입력 방지
+    if (!tasks.task.trim()) return; // 공백 입력 방지
+
+    const updatedTask = {
+      ...tasks,
+      created_at: date,
+    };
 
     try {
-      await saveTasks({ task });
-      setTask("");
+      await saveTasks(updatedTask);
+      setTasks({
+        ...tasks,
+        task: "",
+      });
       setOpen(false);
       fetchTasksByDate(date);
       await fetchCountTasksByDate(date);
@@ -109,10 +125,10 @@ function TodoCreate({ fetchTasksByDate, date, fetchCountTasksByDate }) {
         <InsertFormPositioner>
           <InsertForm onSubmit={handleSubmit}>
             <Input
-              value={task}
+              value={tasks.task}
               onChange={handleInputChange}
               autoFocus
-              placeholder="할 일을 입력 후, Enter 를 누르세요"
+              placeholder="할일을 입력하세요."
             />
           </InsertForm>
         </InsertFormPositioner>

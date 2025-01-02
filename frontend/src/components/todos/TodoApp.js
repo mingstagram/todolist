@@ -12,7 +12,9 @@ const GlobalStyle = createGlobalStyle`
   }
 `;
 
-function TodoApp() {
+function TodoApp({ setIsLoggedIn }) {
+  const sessionStorage = window.sessionStorage;
+  const userId = sessionStorage.getItem("userId");
   const [tasks, setTasks] = useState([]);
   const [error, setError] = useState(null);
   const [date, setDate] = useState(new Date());
@@ -22,7 +24,7 @@ function TodoApp() {
     // 날짜 포맷을 명시적으로 설정 (예: YYYY-MM-DD)
     const formattedDate = date.toISOString().split("T")[0]; // ISO 포맷에서 날짜만 추출
     try {
-      const data = await getTasksByDate(formattedDate); // 서버 호출
+      const data = await getTasksByDate(formattedDate, userId); // 서버 호출
       setTasks(data);
     } catch (err) {
       setError("Failed to load tasks.");
@@ -33,7 +35,7 @@ function TodoApp() {
   const fetchCountTasksByDate = async (date) => {
     const formattedDate = date.toISOString().split("T")[0]; // ISO 포맷에서 날짜만 추출
     try {
-      const data = await countTasksByDate(formattedDate); // 서버 호출
+      const data = await countTasksByDate(formattedDate, userId); // 서버 호출
       setCount(data.data.count);
     } catch (err) {
       setError("Failed to load tasks.");
@@ -41,7 +43,14 @@ function TodoApp() {
     }
   };
 
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("userId");
+  };
+
   useEffect(() => {
+    console.log(date);
     fetchTasksByDate(date);
     fetchCountTasksByDate(date);
   }, [date]);
@@ -55,6 +64,7 @@ function TodoApp() {
           setDate={setDate}
           count={count}
           refreshTasks={() => fetchTasksByDate(date)}
+          handleLogout={handleLogout}
         />
         <TodoList
           tasks={tasks}

@@ -1,37 +1,40 @@
-version: "3.8"
+version: '3.8'
 
 services:
   backend:
     container_name: todolist-backend
-    image: amgkim/todolist-backend:latest # Docker Hub에서 이미지를 가져오도록 수정
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
     ports:
       - "8001:8001"
     environment:
-      - DB_HOST=db
-      - DB_PORT=3306
+      - DB_HOST=db  # db 서비스 이름 사용
+      - DB_PORT=3308
       - DB_USER=root
       - DB_PASSWORD=1111
       - DB_NAME=todolist
     depends_on:
-      - db # backend는 db 서비스가 먼저 실행되어야 함
+      - db  # backend는 db 서비스가 먼저 실행되어야 함
 
   frontend:
     container_name: todolist-frontend
-    image: amgkim/todolist-frontend:latest # Docker Hub에서 이미지를 가져오도록 수정
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
     ports:
       - "3000:80"
 
   db:
     container_name: todolist-db
-    image: mariadb:10.6 # MariaDB 공식 이미지를 그대로 사용
+    image: mysql:8
     ports:
-      - "3306:3306"
+      - "3308:3306"
     environment:
       MYSQL_ROOT_PASSWORD: 1111
       MYSQL_DATABASE: todolist
     volumes:
       - db_data:/var/lib/mysql
-      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
 
 volumes:
   db_data:

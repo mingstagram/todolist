@@ -42,6 +42,8 @@ func InitRouter(db *sql.DB) *mux.Router {
 	// Auth routes
 	router.HandleFunc("/auth/login", authHandler.Login).Methods("POST")
 	router.HandleFunc("/auth/signup", authHandler.SaveUsers).Methods("POST")
+	router.HandleFunc("/auth/kakao", authHandler.InitiateKakaoLogin).Methods("GET")
+	router.HandleFunc("/auth/kakaoRegist", authHandler.HandleKakaoCallback).Methods("GET")
 
 	// 보호된 라우트 (JWT 인증 필요)
 	protectedRoutes := router.PathPrefix("/tasks").Subrouter()

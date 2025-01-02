@@ -1,9 +1,11 @@
 import axios from "axios";
 import axiosInstance from "../config/axiosConfig";
 
-export const getTasksByDate = async (date) => {
+export const getTasksByDate = async (date, userId) => {
   try {
-    const response = await axiosInstance.get(`/tasks?date=${date}`);
+    const response = await axiosInstance.get(
+      `/tasks?date=${date}&userId=${userId}`
+    );
     return response.data;
   } catch (error) {
     console.error("Error load todaytasks:", error);
@@ -21,9 +23,11 @@ export const saveTasks = async (taskData) => {
   }
 };
 
-export const countTasksByDate = async (date) => {
+export const countTasksByDate = async (date, userId) => {
   try {
-    const response = await axiosInstance.get(`/tasks/count?date=${date}`);
+    const response = await axiosInstance.get(
+      `/tasks/count?date=${date}&userId=${userId}`
+    );
     return response.data;
   } catch (error) {
     console.error("Error load todaytasks:", error);

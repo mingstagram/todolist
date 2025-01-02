@@ -97,12 +97,11 @@ const LoginForm = ({ setIsLoggedIn }) => {
             회원가입
           </Link>
         </div>
-        <div style={{ marginTop: "20px" }}>
-          <Divider />
-          <SnsTitle>SNS 로그인</SnsTitle>
-          <SNSButtons />
-        </div>
+        <div style={{ marginTop: "20px" }}></div>
       </Form>
+      {/* <Divider />
+      <SnsTitle>SNS 로그인</SnsTitle>
+      <SNSButtons /> */}
     </AuthTemplate>
   );
 };
